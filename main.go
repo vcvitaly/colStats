@@ -4,8 +4,10 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/fs"
 	"log"
 	"os"
+	"path/filepath"
 )
 
 func main() {
@@ -14,7 +16,11 @@ func main() {
 	column := flag.Int("col", 1, "CSV column on which to execute operation")
 	flag.Parse()
 
-	if err := run(flag.Args(), *op, *column, os.Stdout); err != nil {
+	fileNames, err := listFiles(flag.Args())
+	if err != nil {
+		log.Fatalf("An error happened while traversing the input directory: %v", err)
+	}
+	if err := run(fileNames, *op, *column, os.Stdout); err != nil {
 		log.Fatalf("An error while running the main logic: %v", err)
 	}
 }
@@ -64,4 +70,26 @@ func run(filenames []string, op string, column int, out io.Writer) error {
 
 	_, err := fmt.Fprintln(out, opFunc(consolidate))
 	return err
+}
+
+func listFiles(paths []string) ([]string, error) {
+	filenames := make([]string, 0)
+	for _, p := range paths {
+		err := filepath.Walk(p, func(path string, info fs.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+
+			if !info.IsDir() {
+				filenames = append(filenames, path)
+			}
+
+			return nil
+		})
+
+		if err != nil {
+			return nil, err
+		}
+	}
+	return filenames, nil
 }
