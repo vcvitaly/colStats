@@ -1,0 +1,7 @@
+goos: darwin
+goarch: amd64
+pkg: PowerfulCLIAppsInGo/colStats
+cpu: Intel(R) Core(TM) i7-1068NG7 CPU @ 2.30GHz
+BenchmarkRun-8   	      10	 141847557 ns/op	214891339 B/op	 2527071 allocs/op
+PASS
+ok  	PowerfulCLIAppsInGo/colStats	1.861s
